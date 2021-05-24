@@ -11,6 +11,16 @@ from timeit import default_timer as timer
 import tensorflow as tf
 tf.compat.v1.disable_eager_execution()
 
+try:
+    tpu = tf.distribute.cluster_resolver.TPUClusterResolver()  # TPU detection
+    print('Running on TPU ', tpu.cluster_spec().as_dict()['worker'])
+except ValueError:
+    raise BaseException('ERROR: Not connected to a TPU runtime; please see the previous cell in this notebook for instructions!')
+
+tf.config.experimental_connect_to_cluster(tpu)
+tf.tpu.experimental.initialize_tpu_system(tpu)
+tpu_strategy = tf.distribute.experimental.TPUStrategy(tpu)
+
 import numpy as np
 import sys
 from free_model import Model
@@ -56,7 +66,8 @@ def train(tf_seed, np_seed, train_steps, out_steps, summary_steps, checkpoint_st
     else:
         raw_data = cifar100_input.CIFAR100Data(data_path)
     global_step = tf.compat.v1.train.get_or_create_global_step()
-    model = Model(mode='train', dataset=dataset, train_batch_size=train_batch_size)
+    with tpu_strategy.scope():
+        model = Model(mode='train', dataset=dataset, train_batch_size=train_batch_size)
 
     # Setting up the optimizer
     boundaries = [int(sss[0]) for sss in step_size_schedule][1:]
