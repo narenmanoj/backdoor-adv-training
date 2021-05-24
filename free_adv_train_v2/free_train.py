@@ -33,9 +33,10 @@ import config
 import utilities
 
 def get_path_dir(data_dir, dataset, **_):
-    dataset_dir = dataset
+    # dataset_dir = dataset
+    dataset_dir = 'cifar10-batches-py'
     if dataset == 'cifar10_poisoned':
-        dataset_dir = 'cifar10'
+        dataset_dir = 'cifar10-batches-py'
     path = os.path.join(data_dir, dataset_dir)
     if os.path.islink(path):
         path = os.readlink(path)
