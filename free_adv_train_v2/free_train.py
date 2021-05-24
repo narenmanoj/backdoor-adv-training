@@ -12,7 +12,7 @@ import tensorflow as tf
 tf.compat.v1.disable_eager_execution()
 
 try:
-    tpu = tf.distribute.cluster_resolver.TPUClusterResolver()  # TPU detection
+    tpu = tf.distribute.cluster_resolver.TPUClusterResolver()  # TPU detection. only works with eager
     print('Running on TPU ', tpu.cluster_spec().as_dict()['worker'])
 except ValueError:
     raise BaseException('ERROR: Not connected to a TPU runtime; please see the previous cell in this notebook for instructions!')
